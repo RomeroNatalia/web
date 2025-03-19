@@ -94,8 +94,7 @@
             background-color: #e1e1e1;
         }
         .robot {
-            width: 30px;
-            height: 30px;
+            font-size: 30px;
             margin-right: 10px;
         }
     </style>
@@ -103,13 +102,13 @@
 <body>
     <div class="chat-container" id="chat-container">
         <div class="chat-entry">
-            <img src="robot.png" alt="Robot" class="robot">
+            <span class="robot">🤖</span>
             <div class="chat-bubble left">
                 <span id="welcome-message">Welcome! Would you please register by filling this form?</span>
             </div>
         </div>
         <div class="chat-entry">
-            <img src="robot.png" alt="Robot" class="robot">
+            <span class="robot">🤖</span>
             <div class="chat-bubble left">
                 <span id="bot-message">Hello! What is your full name?</span>
             </div>
@@ -159,14 +158,13 @@
             if (currentQuestionIndex < questions.length) {
                 const chatEntry = document.createElement('div');
                 chatEntry.className = 'chat-entry';
-                const botImage = document.createElement('img');
-                botImage.src = 'robot.png';
-                botImage.alt = 'Robot';
-                botImage.className = 'robot';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
                 botMessage.innerHTML = `<span>${questions[currentQuestionIndex]}</span>`;
-                chatEntry.appendChild(botImage);
+                chatEntry.appendChild(botEmoji);
                 chatEntry.appendChild(botMessage);
                 document.getElementById('chat-container').appendChild(chatEntry);
                 speakText(questions[currentQuestionIndex]);
@@ -181,14 +179,13 @@
                 // Form submission simulation
                 const chatEntry = document.createElement('div');
                 chatEntry.className = 'chat-entry';
-                const botImage = document.createElement('img');
-                botImage.src = 'robot.png';
-                botImage.alt = 'Robot';
-                botImage.className = 'robot';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
                 const thankYouMessage = document.createElement('div');
                 thankYouMessage.className = 'chat-bubble left';
                 thankYouMessage.innerHTML = `<span>Thank you!</span>`;
-                chatEntry.appendChild(botImage);
+                chatEntry.appendChild(botEmoji);
                 chatEntry.appendChild(thankYouMessage);
                 document.getElementById('chat-container').appendChild(chatEntry);
                 speakText("Thank you!");
@@ -240,14 +237,13 @@
         function repeatQuestion(message) {
             const chatEntry = document.createElement('div');
             chatEntry.className = 'chat-entry';
-            const botImage = document.createElement('img');
-            botImage.src = 'robot.png';
-            botImage.alt = 'Robot';
-            botImage.className = 'robot';
+            const botEmoji = document.createElement('span');
+            botEmoji.className = 'robot';
+            botEmoji.textContent = '🤖';
             const botMessage = document.createElement('div');
             botMessage.className = 'chat-bubble left';
             botMessage.innerHTML = `<span>${message}</span>`;
-            chatEntry.appendChild(botImage);
+            chatEntry.appendChild(botEmoji);
             chatEntry.appendChild(botMessage);
             document.getElementById('chat-container').appendChild(chatEntry);
             speakText(message);
@@ -295,14 +291,13 @@
                 const answer = data.webPages.value[0].snippet || "I'm sorry, I couldn't find an answer to your question.";
                 const chatEntry = document.createElement('div');
                 chatEntry.className = 'chat-entry';
-                const botImage = document.createElement('img');
-                botImage.src = 'robot.png';
-                botImage.alt = 'Robot';
-                botImage.className = 'robot';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
                 botMessage.innerHTML = `<span>${answer}</span>`;
-                chatEntry.appendChild(botImage);
+                chatEntry.appendChild(botEmoji);
                 chatEntry.appendChild(botMessage);
                 document.getElementById('chat-container').appendChild(chatEntry);
                 speakText(answer);
@@ -310,14 +305,13 @@
                 console.error('Error fetching answer:', error);
                 const chatEntry = document.createElement('div');
                 chatEntry.className = 'chat-entry';
-                const botImage = document.createElement('img');
-                botImage.src = 'robot.png';
-                botImage.alt = 'Robot';
-                botImage.className = 'robot';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
                 botMessage.innerHTML = `<span>I'm sorry, I couldn't find an answer to your question.</span>`;
-                chatEntry.appendChild(botImage);
+                chatEntry.appendChild(botEmoji);
                 chatEntry.appendChild(botMessage);
                 document.getElementById('chat-container').appendChild(chatEntry);
                 speakText("I'm sorry, I couldn't find an answer to your question.");
