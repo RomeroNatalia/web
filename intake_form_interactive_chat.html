@@ -38,6 +38,8 @@
             font-size: 14px;
             position: relative;
             word-wrap: break-word;
+            display: flex;
+            align-items: center;
         }
         .chat-bubble::after {
             content: "";
@@ -107,12 +109,23 @@
         .option-button:hover {
             background-color: #e1e1e1;
         }
+        .robot {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="chat-container" id="chat-container">
-        <div class="chat-bubble left" id="welcome-message">Welcome! Would you please register by filling this form?</div>
-        <div class="chat-bubble left" id="bot-message">Hello! What is your full name?</div>
+        <div class="chat-bubble left">
+            <img src="robot.png" alt="Robot" class="robot">
+            <span id="welcome-message">Welcome! Would you please register by filling this form?</span>
+        </div>
+        <div class="chat-bubble left">
+            <img src="robot.png" alt="Robot" class="robot">
+            <span id="bot-message">Hello! What is your full name?</span>
+        </div>
         <div class="input-container" id="input-container">
             <input type="text" id="user-input" placeholder="Type your answer here" onkeypress="handleKeyPress(event)">
             <button onclick="handleUserInput()">Send</button>
@@ -158,7 +171,7 @@
             if (currentQuestionIndex < questions.length) {
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
-                botMessage.textContent = questions[currentQuestionIndex];
+                botMessage.innerHTML = `<img src="robot.png" alt="Robot" class="robot"><span>${questions[currentQuestionIndex]}</span>`;
                 document.getElementById('chat-container').appendChild(botMessage);
                 speakText(questions[currentQuestionIndex]);
 
@@ -172,7 +185,7 @@
                 // Form submission simulation
                 const thankYouMessage = document.createElement('div');
                 thankYouMessage.className = 'chat-bubble left';
-                thankYouMessage.textContent = "Thank you!";
+                thankYouMessage.innerHTML = `<img src="robot.png" alt="Robot" class="robot"><span>Thank you!</span>`;
                 document.getElementById('chat-container').appendChild(thankYouMessage);
                 speakText("Thank you!");
 
@@ -223,7 +236,7 @@
         function repeatQuestion(message) {
             const botMessage = document.createElement('div');
             botMessage.className = 'chat-bubble left';
-            botMessage.textContent = message;
+            botMessage.innerHTML = `<img src="robot.png" alt="Robot" class="robot"><span>${message}</span>`;
             document.getElementById('chat-container').appendChild(botMessage);
             speakText(message);
         }
@@ -270,14 +283,14 @@
                 const answer = data.webPages.value[0].snippet || "I'm sorry, I couldn't find an answer to your question.";
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
-                botMessage.textContent = answer;
+                botMessage.innerHTML = `<img src="robot.png" alt="Robot" class="robot"><span>${answer}</span>`;
                 document.getElementById('chat-container').appendChild(botMessage);
                 speakText(answer);
             } catch (error) {
                 console.error('Error fetching answer:', error);
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chat-bubble left';
-                botMessage.textContent = "I'm sorry, I couldn't find an answer to your question.";
+                botMessage.innerHTML = `<img src="robot.png" alt="Robot" class="robot"><span>I'm sorry, I couldn't find an answer to your question.</span>`;
                 document.getElementById('chat-container').appendChild(botMessage);
                 speakText("I'm sorry, I couldn't find an answer to your question.");
             }
