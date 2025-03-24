@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intake Form Chat Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 600px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 80vh;
+            margin: 0 auto;
+        }
+        .chat-entry {
+            display: flex;
+            align-items: flex-start;
+            margin: 5px 0;
+        }
+        .chat-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            position: relative;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+        }
+        .chat-bubble.left {
+            background-color: #e1f5fe;
+            text-align: left;
+            margin-left: 10px;
+        }
+        .chat-bubble.right {
+            background-color: #bbdefb;
+            color: #fff;
+            text-align: right;
+            margin-left: auto;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 15px;
+            width: 100%;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .input-container button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            margin-left: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        .option-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+        .option-button:hover {
+            background-color: #e1e1e1;
+        }
+        .robot {
+            font-size: 30px;
+            margin-right: 10px;
+        }
+    </style>
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <div class="chat-container" id="chat-container">
+        <div class="chat-entry">
+            <span class="robot">🤖</span>
+            <div class="chat-bubble left">
+                <span id="welcome-message">Welcome! Would you please register by filling this form?</span>
+            </div>
+        </div>
+        <div class="chat-entry">
+            <span class="robot">🤖</span>
+            <div class="chat-bubble left">
+                <span id="bot-message">Hello! What is your full name?</span>
+            </div>
+        </div>
+        <div class="input-container" id="input-container">
+            <input type="text" id="user-input" placeholder="Type your answer here" onkeypress="handleKeyPress(event)">
+            <button onclick="handleUserInput()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "What is your full name?",
+            "What is your email address?",
+            "What is your phone number?",
+            "What is your affiliation? (Student, Faculty, Alumni)",
+            "If applicable, what department are you associated with?",
+            "Do you have any comments or questions?",
+            "What is the date today?"
+        ];
+
+        async function saveToGoogleDrive(filename, content) {
+            const clientId = 'YOUR_CLIENT_ID'; // Replace with your client ID
+            const apiKey = 'YOUR_API_KEY'; // Replace with your API key
+            const scopes = 'https://www.googleapis.com/auth/drive.file';
+
+            try {
+                await gapi.load('client:auth2');
+                await gapi.client.init({ apiKey, clientId, scope: scopes });
+                await gapi.auth2.getAuthInstance().signIn();
+
+                const fileMetadata = {
+                    'name': filename,
+                    'parents': ['1YWXuK5lKuAtD_WLOWri-2QY050eWk9gf'] // Replace with your folder ID
+                };
+                const media = {
+                    mimeType: 'text/csv',
+                    body: content
+                };
+
+                const response = await gapi.client.drive.files.create({
+                    resource: fileMetadata,
+                    media: media,
+                    fields: 'id'
+                });
+
+                console.log('File ID: ' + response.result.id);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        }
+
+        let currentQuestionIndex = 0;
+        let responses = {};
+
+        function handleFormCompletion() {
+            const csvContent = Object.values(responses).join(',');
+            const timestamp = new Date().toISOString();
+            const filename = `intake_form_${timestamp}.csv`;
+
+            saveToGoogleDrive(filename, csvContent);
+
+            // Reset form for next intake
+            currentQuestionIndex = 0;
+            responses = {};
+            document.getElementById('chat-container').innerHTML = `
+                <div class="chat-entry">
+                    <span class="robot">🤖</span>
+                    <div class="chat-bubble left">
+                        <span id="welcome-message">Welcome! Would you please register by filling this form?</span>
+                    </div>
+                </div>
+                <div class="chat-entry">
+                    <span class="robot">🤖</span>
+                    <div class="chat-bubble left">
+                        <span id="bot-message">Hello! What is your full name?</span>
+                    </div>
+                </div>
+                <div class="input-container" id="input-container">
+                    <input type="text" id="user-input" placeholder="Type your answer here" onkeypress="handleKeyPress(event)">
+                    <button onclick="handleUserInput()">Send</button>
+                </div>
+            `;
+        }
+
+        function handleUserInput(option = null) {
+            const userInput = option || document.getElementById('user-input').value;
+            if (userInput.trim() === "") return;
+
+            // Validate user input
+            if (!validateInput(userInput, currentQuestionIndex)) return;
+
+            // Display user input
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-bubble right';
+            userMessage.textContent = userInput;
+            document.getElementById('chat-container').appendChild(userMessage);
+
+            // Store response
+            const question = questions[currentQuestionIndex];
+            responses[question] = userInput;
+
+            // Clear input field
+            document.getElementById('user-input').value = "";
+
+            // Move to next question
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-bubble left';
+                botMessage.innerHTML = `<span>${questions[currentQuestionIndex]}</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(botMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText(questions[currentQuestionIndex]);
+
+                // Show options for the affiliation question
+                if (currentQuestionIndex === 3) {
+                    showAffiliationOptions();
+                } else {
+                    moveInputContainerToEnd();
+                }
+            } else {
+                // Form submission simulation
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const thankYouMessage = document.createElement('div');
+                thankYouMessage.className = 'chat-bubble left';
+                thankYouMessage.innerHTML = `<span>Thank you!</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(thankYouMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText("Thank you!");
+
+                handleFormCompletion();
+            }
+
+            // Scroll to the bottom of the chat container
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                handleUserInput();
+            }
+        }
+
+        function validateInput(input, index) {
+            if (index === 0) {
+                // Validate full name (at least two words)
+                if (input.trim().split(" ").length < 2) {
+                    repeatQuestion("I ▋
