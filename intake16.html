@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intake Form Chat Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 600px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 80vh;
+            margin: 0 auto;
+        }
+        .chat-entry {
+            display: flex;
+            align-items: flex-start;
+            margin: 5px 0;
+        }
+        .chat-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            position: relative;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+        }
+        .chat-bubble.left {
+            background-color: #e1f5fe;
+            text-align: left;
+            margin-left: 10px;
+        }
+        .chat-bubble.right {
+            background-color: #bbdefb;
+            color: #fff;
+            text-align: right;
+            margin-left: auto;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 15px;
+            width: 100%;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .input-container button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            margin-left: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        .option-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+        .option-button:hover {
+            background-color: #e1e1e1;
+        }
+        .robot {
+            font-size: 30px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat-container">
+        <div class="chat-entry">
+            <span class="robot">🤖</span>
+            <div class="chat-bubble left">
+                <span id="welcome-message">Welcome! Would you please register by filling this form?</span>
+            </div>
+        </div>
+        <div class="chat-entry">
+            <span class="robot">🤖</span>
+            <div class="chat-bubble left">
+                <span id="bot-message">Hello! What is your full name?</span>
+            </div>
+        </div>
+        <div class="input-container" id="input-container">
+            <input type="text" id="user-input" placeholder="Type your answer here" onkeypress="handleKeyPress(event)">
+            <button onclick="handleUserInput()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "What is your full name?",
+            "What is your email address?",
+            "What is your phone number?",
+            "What is your affiliation? (Student, Faculty, Alumni)",
+            "If applicable, what department are you associated with?",
+            "What brigns you here today?"
+            "Do you have any questions?"
+           
+        ];
+
+        let currentQuestionIndex = 0;
+        const responses = {};
+
+        function handleUserInput(option = null) {
+            const userInput = option || document.getElementById('user-input').value;
+            if (userInput.trim() === "") return;
+
+            // Validate user input
+            if (!validateInput(userInput, currentQuestionIndex)) return;
+
+            // Display user input
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-bubble right';
+            userMessage.textContent = userInput;
+            document.getElementById('chat-container').appendChild(userMessage);
+
+            // Store response
+            const question = questions[currentQuestionIndex];
+            responses[question] = userInput;
+
+            // Clear input field
+            document.getElementById('user-input').value = "";
+
+            // Move to next question
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-bubble left';
+                botMessage.innerHTML = `<span>${questions[currentQuestionIndex]}</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(botMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText(questions[currentQuestionIndex]);
+
+                // Show options for the affiliation question
+                if (currentQuestionIndex === 3) {
+                    showAffiliationOptions();
+                } else {
+                    moveInputContainerToEnd();
+                }
+            } else {
+                // Form submission simulation
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const thankYouMessage = document.createElement('div');
+                thankYouMessage.className = 'chat-bubble left';
+                thankYouMessage.innerHTML = `<span>Thank you!</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(thankYouMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText("Thank you!");
+
+                // Remove input container
+                document.getElementById('input-container').remove();
+            }
+
+            // Scroll to the bottom of the chat container
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                handleUserInput();
+            }
+        }
+
+        function validateInput(input, index) {
+            if (index === 0) {
+                // Validate full name (at least two words)
+                if (input.trim().split(" ").length < 2) {
+                    repeatQuestion("I think you have a typo. Please enter your full name (at least two words).");
+                    return false;
+                }
+            } else if (index === 1) {
+                // Validate email address
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(input)) {
+                    repeatQuestion("I think you have a typo. Please enter a valid email address.");
+                    return false;
+                }
+            } else if (index === 2) {
+                // Validate phone number (10 digits)
+                const phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(input.replace(/\D/g, ''))) {
+                    repeatQuestion("I think you have a typo. Please enter a valid phone number (10 digits).");
+                    return false;
+                }
+            } else if (index === 5) {
+                // Handle comments or questions
+                if (input.toLowerCase().includes("question")) {
+                    fetchAnswer(input);
+                }
+            }
+            return true;
+        }
+
+        function repeatQuestion(message) {
+            const chatEntry = document.createElement('div');
+            chatEntry.className = 'chat-entry';
+            const botEmoji = document.createElement('span');
+            botEmoji.className = 'robot';
+            botEmoji.textContent = '🤖';
+            const botMessage = document.createElement('div');
+            botMessage.className = 'chat-bubble left';
+            botMessage.innerHTML = `<span>${message}</span>`;
+            chatEntry.appendChild(botEmoji);
+            chatEntry.appendChild(botMessage);
+            document.getElementById('chat-container').appendChild(chatEntry);
+            speakText(message);
+        }
+
+        function speakText(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const voice = voices.find(voice => voice.name.includes("Google UK English Female")) || voices[0];
+            speech.voice = voice;
+            speech.pitch = 1.2;
+            speech.rate = 1.1;
+            window.speechSynthesis.speak(speech);
+        }
+
+        function showAffiliationOptions() {
+            const options = ["Student", "Faculty", "Alumni"];
+            const container = document.createElement('div');
+            container.id = "affiliation-options";
+
+            options.forEach(option => {
+                const button = document.createElement('div');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => handleUserInput(option);
+                container.appendChild(button);
+            });
+
+            document.getElementById('chat-container').appendChild(container);
+        }
+
+        function moveInputContainerToEnd() {
+            const inputContainer = document.getElementById('input-container');
+            document.getElementById('chat-container').appendChild(inputContainer);
+        }
+
+        async function fetchAnswer(question) {
+            try {
+                const response = await fetch(`https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(question)}+site:www.create-steam.com`, {
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': 'YOUR_BING_SEARCH_API_KEY'
+                    }
+                });
+                const data = await response.json();
+                const answer = data.webPages.value[0].snippet || "I'm sorry, I couldn't find an answer to your question.";
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-bubble left';
+                botMessage.innerHTML = `<span>${answer}</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(botMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText(answer);
+            } catch (error) {
+                console.error('Error fetching answer:', error);
+                const chatEntry = document.createElement('div');
+                chatEntry.className = 'chat-entry';
+                const botEmoji = document.createElement('span');
+                botEmoji.className = 'robot';
+                botEmoji.textContent = '🤖';
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-bubble left';
+                botMessage.innerHTML = `<span>I'm sorry, I couldn't find an answer to your question.</span>`;
+                chatEntry.appendChild(botEmoji);
+                chatEntry.appendChild(botMessage);
+                document.getElementById('chat-container').appendChild(chatEntry);
+                speakText("I'm sorry, I couldn't find an answer to your question.");
+            }
+        }
+
+    
+    </script>
+</body>
+</html>
