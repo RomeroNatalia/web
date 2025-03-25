@@ -1,0 +1,60 @@
+import React, { useState } from 'react';
+import { Button, Input, Textarea } from "@/components/ui";
+import { saveAs } from 'file-saver';
+
+export default function IntakeForm() {
+    const [formData, setFormData] = useState({});
+    const [submitted, setSubmitted] = useState(false);
+
+    const questions = [
+        "What is your full name?",
+        "What is your email address?",
+        "What are your research interests?",
+        "How can the Sandbox Lab support your work?"
+    ];
+
+    const handleChange = (question, value) => {
+        setFormData({ ...formData, [question]: value });
+    };
+
+    const handleSubmit = () => {
+        const csvContent = Object.entries(formData)
+            .map(([question, answer]) => `${question},${answer}`)
+            .join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        saveAs(blob, "sandbox_intake_form.csv");
+        setSubmitted(true);
+    };
+
+    if (submitted) {
+        return <div className="p-4 text-xl text-green-600">Thank you for completing the form!</div>;
+    }
+
+    return (
+        <div className="p-4 space-y-6">
+            <div className="bg-blue-200 p-4 rounded-xl">Welcome to the Sandbox (former MPCR Lab)!</div>
+            <audio controls className="w-full">
+                <source src="/welcome_message.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+            </audio>
+
+            {questions.map((question, index) => (
+                <div key={index} className="flex flex-col space-y-2">
+                    <div className="bg-blue-500 text-white p-2 rounded-xl self-start">{question}</div>
+                    <div className="bg-gray-100 text-gray-700 p-2 rounded-xl self-end">
+                        <Textarea
+                            rows={3}
+                            placeholder="Type your answer here..."
+                            onChange={(e) => handleChange(question, e.target.value)}
+                        />
+                    </div>
+                </div>
+            ))}
+
+            <Button onClick={handleSubmit} className="bg-green-500 text-white p-2 rounded-xl w-full">
+                Submit
+            </Button>
+        </div>
+    );
+}
