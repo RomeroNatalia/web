@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Style Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f0f5;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .chat-form {
+      background-color: white;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-bubble {
+      position: relative;
+      max-width: 80%;
+      padding: 1rem;
+      border-radius: 20px;
+      margin: 1rem 0;
+    }
+
+    .question {
+      background-color: #e0d7f9;
+      color: #333;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+
+    .question::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: -10px;
+      border: 10px solid transparent;
+      border-right-color: #e0d7f9;
+    }
+
+    .answer {
+      background-color: #d9f9e0;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+    }
+
+    .answer::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      right: -10px;
+      border: 10px solid transparent;
+      border-left-color: #d9f9e0;
+    }
+
+    input[type="text"] {
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      width: 100%;
+      outline: none;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.7rem 1.5rem;
+      background-color: #673ab7;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: block;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #5a2ea6;
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <form class="chat-form" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSftxdit5m1d2gyQEMRCqYS-KJMrm5X1T5q7MaWN-MDSgTZsAg/formResponse" method="POST">
+    <div class="bubble-wrapper">
+      <div class="chat-bubble question">
+        What is your name?
+      </div>
+
+      <div class="chat-bubble answer">
+        <input type="text" name="entry.2113426740" placeholder="Type your answer..." required>
+      </div>
+    </div>
+
+    <!-- Hidden inputs for Google Form -->
+    <input type="hidden" name="fvv" value="1">
+    <input type="hidden" name="fbzx" value="4957362150529057750">
+    <input type="hidden" name="pageHistory" value="0">
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
