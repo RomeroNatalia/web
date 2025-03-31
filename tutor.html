@@ -1,25 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Argumentative Writing Tutor</title>
+    <title>Argumentative Writing Chatbot</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        #chatbox { width: 100%; max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 15px; height: 500px; overflow-y: scroll; }
+        .user { color: blue; margin-bottom: 10px; }
+        .bot { color: green; margin-bottom: 10px; }
+        input, button { padding: 10px; margin-top: 10px; width: 100%; }
+    </style>
 </head>
 <body>
-    <h1>Welcome to your Argumentative Writing Tutor!</h1>
-    <p>Please submit your assignment and your draft essay to get started.</p>
+    <h1>Welcome to your Writing Tutor 🤖✍️</h1>
+    <p>Let's improve your argumentative writing. Start by telling me your assignment prompt!</p>
 
-    <form method="POST">
-        <label>Assignment Prompt:</label><br>
-        <textarea name="assignment" rows="4" cols="50" required></textarea><br><br>
+    <div id="chatbox"></div>
 
-        <label>Draft Essay:</label><br>
-        <textarea name="draft" rows="10" cols="50" required></textarea><br><br>
+    <input type="text" id="userInput" placeholder="Type your message..." autofocus>
+    <button onclick="sendMessage()">Send</button>
 
-        <input type="submit" value="Get Feedback">
-    </form>
+    <script>
+        let conversation = [
+            { role: "system", content: "You are a friendly, knowledgeable tutor helping students improve argumentative writing. Never rewrite their essay, only guide with questions and comments." },
+            { role: "assistant", content: "Hi there! 👋 Please tell me your assignment prompt and we’ll get started." }
+        ];
 
-    {% if feedback %}
-        <h2>Your Feedback:</h2>
-        <div style="white-space: pre-wrap;">{{ feedback }}</div>
-    {% endif %}
+        document.getElementById("chatbox").innerHTML += `<div class='bot'><b>Tutor:</b> ${conversation[1].content}</div>`;
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value;
+            if (!message.trim()) return;
+
+            conversation.push({ role: "user", content: message });
+
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<div class='user'><b>You:</b> ${message}</div>`;
+            input.value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversation: conversation })
+            });
+
+            const data = await response.json();
+            const reply = data.reply;
+            conversation.push({ role: "assistant", content: reply });
+
+            chatbox.innerHTML += `<div class='bot'><b>Tutor:</b> ${reply}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
 </body>
 </html>
