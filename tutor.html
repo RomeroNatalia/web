@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Argumentative Writing Tutor</title>
+</head>
+<body>
+    <h1>Welcome to your Argumentative Writing Tutor!</h1>
+    <p>Please submit your assignment and your draft essay to get started.</p>
+
+    <form method="POST">
+        <label>Assignment Prompt:</label><br>
+        <textarea name="assignment" rows="4" cols="50" required></textarea><br><br>
+
+        <label>Draft Essay:</label><br>
+        <textarea name="draft" rows="10" cols="50" required></textarea><br><br>
+
+        <input type="submit" value="Get Feedback">
+    </form>
+
+    {% if feedback %}
+        <h2>Your Feedback:</h2>
+        <div style="white-space: pre-wrap;">{{ feedback }}</div>
+    {% endif %}
+</body>
+</html>
