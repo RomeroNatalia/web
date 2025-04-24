@@ -1,0 +1,124 @@
+import pandas as pd
+from datetime import datetime
+
+quiz_data = [
+    {
+        "question": "1. What is the direction of the magnetic force on a positive charge moving upward in a magnetic field pointing north?",
+        "options": ["A. East", "B. South", "C. West", "D. Into the page"],
+        "answer": "C",
+        "explanation": "Use the right-hand rule: fingers in direction of velocity (up), palm to field (north), thumb points to force (west)."
+    },
+    {
+        "question": "2. The speed of a wave is given by:",
+        "options": ["A. wavelength × frequency", "B. frequency ÷ wavelength", "C. amplitude × frequency", "D. energy ÷ frequency"],
+        "answer": "A",
+        "explanation": "Wave speed = λ × f, where λ is wavelength and f is frequency."
+    },
+    {
+        "question": "3. What phenomenon explains light bending when passing through different media?",
+        "options": ["A. Reflection", "B. Diffraction", "C. Refraction", "D. Polarization"],
+        "answer": "C",
+        "explanation": "Refraction occurs due to change in speed of light in different media."
+    },
+    {
+        "question": "4. Which theory is used to explain time dilation?",
+        "options": ["A. Newtonian Mechanics", "B. Quantum Mechanics", "C. Special Relativity", "D. General Relativity"],
+        "answer": "C",
+        "explanation": "Special Relativity explains time dilation for objects moving near light speed."
+    },
+    {
+        "question": "5. What does the photoelectric effect demonstrate?",
+        "options": ["A. Wave nature of electrons", "B. Energy quantization of atoms", "C. Particle nature of light", "D. Uncertainty principle"],
+        "answer": "C",
+        "explanation": "Photoelectric effect shows that light behaves as particles (photons) with quantized energy."
+    },
+    {
+        "question": "6. Which of the following has the highest energy photons?",
+        "options": ["A. Microwaves", "B. Infrared", "C. Visible light", "D. X-rays"],
+        "answer": "D",
+        "explanation": "Photon energy increases with frequency. X-rays have the highest frequency here."
+    },
+    {
+        "question": "7. What type of wave is sound?",
+        "options": ["A. Transverse", "B. Electromagnetic", "C. Longitudinal", "D. Standing"],
+        "answer": "C",
+        "explanation": "Sound is a mechanical longitudinal wave that requires a medium to propagate."
+    },
+    {
+        "question": "8. A lens that converges parallel rays to a point is a:",
+        "options": ["A. Concave lens", "B. Diverging lens", "C. Convex lens", "D. Flat lens"],
+        "answer": "C",
+        "explanation": "Convex lenses are converging lenses that focus light to a point."
+    },
+    {
+        "question": "9. The magnetic field around a current-carrying wire forms:",
+        "options": ["A. Straight lines", "B. Concentric circles", "C. Helices", "D. Random patterns"],
+        "answer": "B",
+        "explanation": "The magnetic field lines around a straight current-carrying wire are concentric circles."
+    },
+    {
+        "question": "10. In the double-slit experiment, increasing the wavelength causes:",
+        "options": ["A. Fringes to get closer", "B. Fringes to disappear", "C. Fringes to spread out", "D. No change in pattern"],
+        "answer": "C",
+        "explanation": "Longer wavelength increases fringe spacing in interference patterns."
+    }
+]
+
+# Get user info
+user_name = input("Enter your name: ").strip()
+score = 0
+wrong_answers = []
+
+for item in quiz_data:
+    print("\n" + item["question"])
+    for opt in item["options"]:
+        print(opt)
+    user_input = input("Your answer (A/B/C/D): ").strip().upper()
+
+    if user_input == item["answer"]:
+        print("✅ Correct!")
+        score += 1
+    else:
+        print("❌ Incorrect.")
+        wrong_answers.append({
+            "Question": item["question"],
+            "Your Answer": user_input,
+            "Correct Answer": item["answer"],
+            "Explanation": item["explanation"]
+        })
+
+# Show final score
+print("\n=============================")
+print(f"🎓 Final Score: {score} / {len(quiz_data)}")
+print("=============================")
+
+# Save to Excel-compatible CSV
+timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+results_data = {
+    "Name": [user_name],
+    "Score": [score],
+    "Total Questions": [len(quiz_data)],
+    "Time": [timestamp]
+}
+df_summary = pd.DataFrame(results_data)
+
+# Save summary to results.csv (append mode)
+summary_file = "quiz_results_summary.csv"
+try:
+    existing = pd.read_csv(summary_file)
+    df_summary = pd.concat([existing, df_summary], ignore_index=True)
+except FileNotFoundError:
+    pass
+
+df_summary.to_csv(summary_file, index=False)
+
+# Save detailed wrong answers
+if wrong_answers:
+    df_wrong = pd.DataFrame(wrong_answers)
+    wrong_file = f"{user_name.replace(' ', '_').lower()}_mistakes.csv"
+    df_wrong.to_csv(wrong_file, index=False)
+    print(f"❗ Your incorrect answers and explanations were saved to: {wrong_file}")
+else:
+    print("🎉 Perfect! No incorrect answers.")
+
+print(f"📊 Your score was saved to: {summary_file}")
